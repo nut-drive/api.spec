@@ -1,0 +1,210 @@
+openapi: 3.0.3
+info:
+  title: Nutdrive
+  description: |-
+    This is the API description of the Nutrive
+  contact:
+    email: some@email.com
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit
+  version: 0.0.1
+
+servers:
+  - url: https://base-url.com
+tags:
+  - name: info
+    description: General Information about the Nutdrive service including pricing.
+
+  - name: dump data
+    description: Store data with Nutdrive
+
+  - name: get data
+    description: Retrieve previously saved data from Nutdrive
+
+paths:
+  /info:
+    get:
+      tags:
+        - info
+      summary: Get info
+      description: Reteive information about pricing
+      operationId: Get info
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetInfoSuccessResponse'
+        '402':
+          description: Payment Required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentRequiredResponse'
+
+        '503':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorResponse'
+
+
+
+  /data:
+    post:
+      tags:
+        - dump data
+      summary: Dump/Store new data
+      description: Allows the storage of a file or string on Nutdrive
+
+      operationId: dump data
+
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DumpDataSuccessResponse'
+        '402':
+          description: Payment required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentRequiredResponse'
+        '503':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorResponse'
+
+
+
+  /data/{file-id}:
+    get:
+      tags:
+        - get data
+      summary: Finds Pets by tags
+      description: Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
+      operationId: findPetsByTags
+      parameters:
+        - name: file-id
+          in: path
+          description: valid ID of a file aquired after posting the file initially.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            maxLength: 35
+      responses:
+        '200':
+          description: successful operation
+          content:
+            multipart/form-data:
+              schema:
+                $ref: '#/components/schemas/GetDataSuccessResponse'
+        '402':
+          description: Payment required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentRequiredResponse'
+        '503':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorResponse'
+
+
+
+components:
+  schemas:
+    GetInfoSuccessResponse:
+      type: object
+      properties:
+        dump_data_fee:
+          type: string
+          description: Fee in Sat (per MB per hour)
+          example: "19.123"
+        endpoints_call_fees:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+                description: path of the corresponding endpoint call fee
+                example: "/data/{file-id}"
+              fee:
+                type: string
+                description: per-call minimum fee in sats
+                example: "2"
+
+    DumpDataSuccessResponse:
+      type: object
+      properties:
+        file-id:
+          type: string
+          format: uuid
+          example: '54e62b52-f933-46ba-a22a-6b611e93626c'
+        valid_from:
+          description: Timestamp at the point in time that the data was saved.
+          type: string
+          format: date-time
+          example: "1970-01-01T00:00:00.000Z"
+        valid_until:
+          description: Timestamp of deletion of the file on Nutdrive.
+          type: string
+          format: date-time
+          example: "1970-01-01T00:00:00.000Z"
+
+    GetDataSuccessResponse:
+      type: string
+      format: binary
+    PaymentRequiredResponse:
+      type: object
+      properties:
+        dump_data_fee:
+          type: string
+          description: Fee in Sat (per MB per hour)
+          example: "19.123"
+        endpoints_call_fees:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+                description: path of the corresponding endpoint call fee
+                example: "/data/{file-id}"
+              fee:
+                type: string
+                description: per-call minimum fee in sats
+                example: "2"
+
+    InternalServerErrorResponse:
+      type: object
+      properties:
+        error:
+          description: Error text
+          type: string
+          example: "some error text"
+
+  securitySchemes:
+    petstore_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://petstore3.swagger.io/oauth/authorize
+          scopes:
+            write:pets: modify pets in your account
+            read:pets: read your pets
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
