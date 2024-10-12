@@ -30,6 +30,7 @@ paths:
       summary: Get info
       description: Reteive information about pricing
       operationId: Get info
+
       responses:
         '200':
           description: Successful operation
@@ -52,8 +53,7 @@ paths:
                 $ref: '#/components/schemas/InternalServerErrorResponse'
 
 
-
-  /data:
+  /data/{file-name}:
     post:
       tags:
         - dump data
@@ -61,6 +61,14 @@ paths:
       description: Allows the storage of a file or string on Nutdrive
 
       operationId: dump data
+      parameters:
+        - name: file-name
+          in: path
+          description: file-name of the file
+          required: true
+          schema:
+            type: string
+            maxLength: 16
 
       responses:
         '200':
@@ -119,8 +127,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerErrorResponse'
-
-
 
 components:
   schemas:
@@ -204,17 +210,3 @@ components:
           description: Error text
           type: string
           example: "some error text"
-
-  securitySchemes:
-    petstore_auth:
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: https://petstore3.swagger.io/oauth/authorize
-          scopes:
-            write:pets: modify pets in your account
-            read:pets: read your pets
-    api_key:
-      type: apiKey
-      name: api_key
-      in: header
