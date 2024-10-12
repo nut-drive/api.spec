@@ -28,7 +28,7 @@ paths:
       tags:
         - info
       summary: Get info
-      description: Reteive information about pricing
+      description: Retrieve information about pricing
       operationId: Get info
 
       responses:
@@ -53,7 +53,7 @@ paths:
                 $ref: '#/components/schemas/InternalServerErrorResponse'
 
 
-  /data/{file-name}:
+  /data/{file-ref}:
     post:
       tags:
         - dump data
@@ -62,9 +62,9 @@ paths:
 
       operationId: dump data
       parameters:
-        - name: file-name
+        - name: file-ref
           in: path
-          description: file-name of the file
+          description: file-ref of the file
           required: true
           schema:
             type: string
@@ -90,9 +90,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerErrorResponse'
 
-
-
-  /data/{file-id}:
     get:
       tags:
         - get data
@@ -100,7 +97,7 @@ paths:
       description: Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
       operationId: findPetsByTags
       parameters:
-        - name: file-id
+        - name: file-ref
           in: path
           description: valid ID of a file aquired after posting the file initially.
           required: true
