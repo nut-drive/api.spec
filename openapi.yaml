@@ -52,43 +52,6 @@ paths:
                 $ref: '#/components/schemas/InternalServerErrorResponse'
 
 
-  /voucher:
-    post:
-      tags:
-        - Create Voucher
-      summary: Create voucher to pay for other endpoints
-      description: Create voucher to pay for other endpoints
-      operationId: create voucher
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                payment-type:
-                  description: Type of channel user for the payment given in "payment"
-                  type: string
-                  enum:
-                    - LIGHTNING
-                    - ECASH
-                payment:
-                  type: string
-                  description: Content of the payment (lightning or ecash), depending on your choice in payment-type
-
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreateVoucherSuccessResponse'
-        '503':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerErrorResponse'
-
 
   /data:
     post:
@@ -98,12 +61,6 @@ paths:
       description: Allows the storage of a file or string on Nutdrive
 
       operationId: dump data
-      requestBody:
-        content:
-          multipart/www-form-data:
-            schema:
-              type: string
-              format: binary
 
       responses:
         '200':
@@ -206,19 +163,6 @@ components:
           format: date-time
           example: "1970-01-01T00:00:00.000Z"
 
-    CreateVoucherSuccessResponse:
-      type: object
-      properties:
-        voucher-id:
-          description: Save this ID to use in a subsequent response
-          type: string
-          format: uuid
-        timestamp:
-          type: string
-          format: date-time
-          example: "1970-01-01T00:00:00.000Z"
-
-
     GetDataSuccessResponse:
       type: string
       format: binary
@@ -227,7 +171,7 @@ components:
       properties:
         dump_data_fee:
           type: string
-          description: Fee in Satoshis (10^-8 BTC) per byte per minute
+          description: Fee in Satoshis (10^-8 BTC) per byte per hour
           example: "19.123"
         endpoints_call_fees:
           type: array
@@ -262,10 +206,15 @@ components:
           example: "some error text"
 
   securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT  # optional, for documentation purposes only
-
-security:
-  - bearerAuth: []
+    petstore_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://petstore3.swagger.io/oauth/authorize
+          scopes:
+            write:pets: modify pets in your account
+            read:pets: read your pets
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
