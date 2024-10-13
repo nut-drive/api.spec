@@ -143,6 +143,16 @@ components:
                 type: string
                 description: path of the corresponding endpoint call fee
                 example: "/data/{file-id}"
+              http_verb:
+                type: string
+                description: HTTP verb associated with the request
+                enum:
+                  - POST
+                  - GET
+                  - PUT
+                  - OPTIONS
+                  - DELETE
+                  - PATCH
               fee:
                 type: string
                 description: per-call minimum fee in sats
